@@ -1,14 +1,22 @@
 <template>
   <v-container fluid>
     <v-row align="center">
-      <v-col class="d-flex" cols="4" md="5" sm="12" xs="12">
-        <v-select
+      <v-col cols="12">
+        <v-toolbar-title>Countries selection</v-toolbar-title>
+
+        <v-autocomplete
           :items="country"
-          :value="location"
+          :loading="isLoading"
+          :search-input.sync="search"
+          hide-no-data
+          hide-selected
           label="Countries"
+          return-object
+          :value="location"
           outlined
           @change="fetchLocationData"
-        ></v-select>
+        />
+
       </v-col>
 
       <v-col cols="12">
@@ -64,6 +72,9 @@ export default {
       },
       country: [],
       location: 'Canada',
+      model: null,
+      search: null,
+      isLoading: false,
       loading: true,
       errored: false
     }
@@ -109,9 +120,27 @@ export default {
       }
     }
   },
+  watch: {
+    search (val) {
+      if (this.fetchLocationData.length > 0) return
+      if (this.isLoading) return
+      this.isLoading = true
+      fetch('https://api.covid19api.com/countries')
+        .then(res => res.json())
+        .then(res => {
+          const { count, Country } = res
+          this.count = count
+          this.Country = Country
+        })
+        .catch(err => {
+          console.log(err)
+        })
+        .finally(() => (this.isLoading = false))
+    }
+  },
   mounted () {
     axios
-      .get('https://api.covid19api.com/countries?orderBy=Country')
+      .get('https://api.covid19api.com/countries')
       .then(response => {
         this.country = response.data.map(item => {
           return item.Country
