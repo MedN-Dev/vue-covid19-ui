@@ -3,7 +3,6 @@
     <v-row align="center">
       <v-col cols="12">
         <v-toolbar-title>Countries selection</v-toolbar-title>
-
         <v-autocomplete
           :items="country"
           :loading="isLoading"
@@ -16,7 +15,6 @@
           outlined
           @change="fetchLocationData"
         />
-
       </v-col>
 
       <v-col cols="12">
@@ -25,7 +23,7 @@
             <v-toolbar-title>COVID 19 Total Cumulative Cases - {{location}}</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <line-chart :chart-data="lineData"></line-chart>
+            <line-chart :chart-data="lineData" />
           </v-card-text>
         </v-card>
       </v-col>
@@ -35,7 +33,7 @@
             <v-toolbar-title>COVID 19 Daily New Cases - {{location}}</v-toolbar-title>
           </v-toolbar>
           <v-card-text>
-            <bar-chart :chart-data="barData"></bar-chart>
+            <bar-chart :chart-data="barData" />
           </v-card-text>
         </v-card>
       </v-col>
@@ -44,10 +42,10 @@
 </template>
 
 <script>
+import moment from 'moment'
 import axios from 'axios'
 import LineChart from './LineChart.js'
 import BarChart from './BarChart.js'
-import moment from 'moment'
 
 export default {
   components: { LineChart, BarChart },
@@ -71,6 +69,10 @@ export default {
         grey: 'rgb(201, 203, 207)'
       },
       country: [],
+      gData: {
+        labels: [],
+        datasets: []
+      },
       location: 'Canada',
       model: null,
       search: null,
@@ -80,22 +82,43 @@ export default {
     }
   },
   methods: {
+    async getGlobal () {
+      const res = await fetch('https://api.covid19api.com/summary')
+      const data = await res.json()
+      const gDataOpts = [
+        { id: 1, color: 'blue', label: 'NewConfirmed' },
+        { id: 2, color: 'red', label: 'NewDeaths' },
+        { id: 3, color: 'red', label: 'NewRecovered' }
+      ]
+      this.gData = this.getUpdatedCartData(data.Global, gDataOpts)
+    },
+    getUpdatedCartData (data, opts) {
+      const datasets = opts.map(element => {
+        return {
+          label: element.label,
+          data: data.data.map(item => item[element.label])
+        }
+      })
+      console.log(datasets)
+      return {
+        labels: data.data.map(item => {
+          return item.Global
+        }),
+        datasets: datasets
+      }
+    },
     fetchLocationData (location) {
       axios.get(`https://api.covid19api.com/country/${location}`).then(data => {
         this.location = location
-
         const lineDataOpts = [
           { id: 1, color: 'blue', label: 'Confirmed' }, // total Active
           { id: 2, color: 'red', label: 'Deaths' } // total deaths
         ]
-
         const barDataOpts = [
           { id: 3, color: 'green', label: 'Recovered' }, // daily new cases
           { id: 4, color: 'red', label: 'Active' } // daily deaths
         ]
-
         this.lineData = this.getUpdatedChartData(data, lineDataOpts)
-
         this.barData = this.getUpdatedChartData(data, barDataOpts)
       })
     },
@@ -139,6 +162,7 @@ export default {
     }
   },
   mounted () {
+    this.getGlobal()
     axios
       .get('https://api.covid19api.com/countries')
       .then(response => {
