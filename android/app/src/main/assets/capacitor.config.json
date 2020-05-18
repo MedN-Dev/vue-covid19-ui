@@ -1,0 +1,7 @@
+{
+    "appId": "org.covid.com",
+    "appName": "Covid-19",
+    "bundledWebRuntime": false,
+    "npmClient": "npm",
+    "webDir": "dist"
+  }

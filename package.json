@@ -5,12 +5,27 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:web": "vue-cli-service build",
+    "build:mobile": "npm run cap.copy && npm run cap.update",
+    "build:mobile:ios": "npm run cap.copy && npx cap update ios",
+    "build:mobile:android": "npm run cap.copy && npx cap update android",
+    "build:prod": "npm run build:web -- --prod && npm run build:mobile",
+    "cap.add.ios": "npx cap add ios",
+    "cap.add.android": "npx cap add android",
+    "cap.ios": "npx cap open ios",
+    "cap.android": "npx cap open android",
+    "cap.copy": "npx cap copy",
+    "cap.update": "npx cap update",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@capacitor/android": "^2.1.0",
+    "@capacitor/cli": "^2.1.0",
+    "@capacitor/core": "^2.1.0",
     "axios": "^0.19.2",
     "chart.js": "^2.9.3",
     "core-js": "^3.6.5",
+    "number-abbreviate": "^2.0.0",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.0",
     "vuetify": "^2.2.28"
