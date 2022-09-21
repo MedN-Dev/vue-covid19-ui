@@ -28,7 +28,7 @@
     "number-abbreviate": "^2.0.0",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.0",
-    "vuetify": "^2.2.28"
+    "vuetify": "^2.6.10"
   },
   "devDependencies": {
     "@mdi/font": "^5.2.45",
